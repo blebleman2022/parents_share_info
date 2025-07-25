@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件图标测试</title>
+    <link href="https://cdn.jsdelivr.net/npm/element-plus@2.4.2/dist/index.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+            background-color: #f5f7fa;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .file-preview {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .file-icon {
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .file-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .file-name {
+            font-weight: 500;
+            color: #303133;
+            margin-bottom: 4px;
+            word-break: break-all;
+        }
+        
+        .file-size {
+            font-size: 12px;
+            color: #909399;
+        }
+        
+        .file-type {
+            font-size: 12px;
+            color: #67c23a;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📁 文件类型图标展示</h1>
+        <p>以下是不同文件类型对应的图标和颜色：</p>
+        
+        <div class="file-preview">
+            <h3>📄 文档类型</h3>
+            
+            <div class="file-item">
+                <div class="file-icon">
+                    <i class="el-icon-document" style="color: #e74c3c;"></i>
+                </div>
+                <div class="file-info">
+                    <div class="file-name">示例文档.pdf</div>
+                    <div class="file-size">2.5 MB</div>
+                    <div class="file-type">PDF文档</div>
+                </div>
+            </div>
+            
+            <div class="file-item">
+                <div class="file-icon">
+                    <i class="el-icon-document" style="color: #2980b9;"></i>
+                </div>
+                <div class="file-info">
+                    <div class="file-name">教案模板.doc</div>
+                    <div class="file-size">1.2 MB</div>
+                    <div class="file-type">Word文档</div>
+                </div>
+            </div>
+            
+            <div class="file-item">
+                <div class="file-icon">
+                    <i class="el-icon-document" style="color: #2980b9;"></i>
+                </div>
+                <div class="file-info">
+                    <div class="file-name">课件资料.docx</div>
+                    <div class="file-size">3.1 MB</div>
+                    <div class="file-type">Word文档</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="file-preview">
+            <h3>📊 演示文稿</h3>
+            
+            <div class="file-item">
+                <div class="file-icon">
+                    <i class="el-icon-document" style="color: #d35400;"></i>
+                </div>
+                <div class="file-info">
+                    <div class="file-name">数学课件.ppt</div>
+                    <div class="file-size">5.8 MB</div>
+                    <div class="file-type">PowerPoint演示文稿</div>
+                </div>
+            </div>
+            
+            <div class="file-item">
+                <div class="file-icon">
+                    <i class="el-icon-document" style="color: #d35400;"></i>
+                </div>
+                <div class="file-info">
+                    <div class="file-name">英语课件.pptx</div>
+                    <div class="file-size">12.3 MB</div>
+                    <div class="file-type">PowerPoint演示文稿</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="file-preview">
+            <h3>📈 电子表格</h3>
+            
+            <div class="file-item">
+                <div class="file-icon">
+                    <i class="el-icon-s-grid" style="color: #27ae60;"></i>
+                </div>
+                <div class="file-info">
+                    <div class="file-name">成绩统计.xls</div>
+                    <div class="file-size">456 KB</div>
+                    <div class="file-type">Excel电子表格</div>
+                </div>
+            </div>
+            
+            <div class="file-item">
+                <div class="file-icon">
+                    <i class="el-icon-s-grid" style="color: #27ae60;"></i>
+                </div>
+                <div class="file-info">
+                    <div class="file-name">学生名单.xlsx</div>
+                    <div class="file-size">789 KB</div>
+                    <div class="file-type">Excel电子表格</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="file-preview">
+            <h3>🖼️ 图片文件</h3>
+            
+            <div class="file-item">
+                <div class="file-icon">
+                    <i class="el-icon-picture" style="color: #9b59b6;"></i>
+                </div>
+                <div class="file-info">
+                    <div class="file-name">课堂照片.jpg</div>
+                    <div class="file-size">2.1 MB</div>
+                    <div class="file-type">JPEG图片</div>
+                </div>
+            </div>
+            
+            <div class="file-item">
+                <div class="file-icon">
+                    <i class="el-icon-picture" style="color: #9b59b6;"></i>
+                </div>
+                <div class="file-info">
+                    <div class="file-name">示意图.png</div>
+                    <div class="file-size">1.5 MB</div>
+                    <div class="file-type">PNG图片</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="file-preview">
+            <h3>🗜️ 压缩文件</h3>
+            
+            <div class="file-item">
+                <div class="file-icon">
+                    <i class="el-icon-folder-opened" style="color: #f39c12;"></i>
+                </div>
+                <div class="file-info">
+                    <div class="file-name">教学资源包.zip</div>
+                    <div class="file-size">25.6 MB</div>
+                    <div class="file-type">ZIP压缩包</div>
+                </div>
+            </div>
+            
+            <div class="file-item">
+                <div class="file-icon">
+                    <i class="el-icon-folder-opened" style="color: #f39c12;"></i>
+                </div>
+                <div class="file-info">
+                    <div class="file-name">课件合集.rar</div>
+                    <div class="file-size">18.9 MB</div>
+                    <div class="file-type">RAR压缩包</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="file-preview">
+            <h3>❓ 其他文件</h3>
+            
+            <div class="file-item">
+                <div class="file-icon">
+                    <i class="el-icon-document" style="color: #7f8c8d;"></i>
+                </div>
+                <div class="file-info">
+                    <div class="file-name">未知文件.unknown</div>
+                    <div class="file-size">1.0 MB</div>
+                    <div class="file-type">未知文件类型</div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #fff; border-radius: 8px;">
+            <h3>🎨 颜色说明</h3>
+            <ul>
+                <li><span style="color: #e74c3c;">■</span> <strong>PDF文档</strong> - 红色 (#e74c3c)</li>
+                <li><span style="color: #2980b9;">■</span> <strong>Word文档</strong> - 蓝色 (#2980b9)</li>
+                <li><span style="color: #d35400;">■</span> <strong>PowerPoint</strong> - 橙色 (#d35400)</li>
+                <li><span style="color: #27ae60;">■</span> <strong>Excel表格</strong> - 绿色 (#27ae60)</li>
+                <li><span style="color: #9b59b6;">■</span> <strong>图片文件</strong> - 紫色 (#9b59b6)</li>
+                <li><span style="color: #f39c12;">■</span> <strong>压缩文件</strong> - 黄色 (#f39c12)</li>
+                <li><span style="color: #7f8c8d;">■</span> <strong>其他文件</strong> - 灰色 (#7f8c8d)</li>
+            </ul>
+        </div>
+        
+        <div style="margin-top: 20px; text-align: center;">
+            <a href="/static/index.html" style="color: #409eff; text-decoration: none;">← 返回主页面</a>
+        </div>
+    </div>
+</body>
+</html>

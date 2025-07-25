@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K12家校学习资料共享平台</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+            background-color: #f5f7fa;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        }
+        .btn {
+            background: #409eff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #66b1ff;
+        }
+        .btn-success {
+            background: #67c23a;
+        }
+        .btn-success:hover {
+            background: #85ce61;
+        }
+        .input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #dcdfe6;
+            border-radius: 5px;
+            margin: 5px 0;
+            box-sizing: border-box;
+        }
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .resource-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        }
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #f0f9ff;
+            color: #1e40af;
+            border-radius: 3px;
+            font-size: 12px;
+            margin: 2px;
+        }
+        .hidden {
+            display: none;
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 400px;
+            max-width: 90%;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .user-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .search-bar input, .search-bar select {
+            flex: 1;
+            min-width: 150px;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #409eff;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎓 K12家校学习资料共享平台</h1>
+        <p>基于积分机制的学习资源共享社区</p>
+        <div id="auth-buttons">
+            <button class="btn" onclick="showLogin()">登录</button>
+            <button class="btn btn-success" onclick="showRegister()">注册</button>
+        </div>
+        <div id="user-menu" class="hidden">
+            <span id="user-name">用户</span>
+            <button class="btn" onclick="logout()">退出</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- 用户信息卡片 -->
+        <div id="user-info" class="user-info hidden">
+            <h3>欢迎回来，<span id="user-nickname">用户</span>！</h3>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="user-points">0</div>
+                    <div class="stat-label">积分</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="user-level">新手用户</div>
+                    <div class="stat-label">等级</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="user-downloads">0</div>
+                    <div class="stat-label">今日下载</div>
+                </div>
+            </div>
+            <div>
+                <button class="btn" onclick="dailySignIn()">每日签到</button>
+                <button class="btn btn-success" onclick="showUpload()">上传资源</button>
+            </div>
+        </div>
+
+        <!-- 搜索筛选 -->
+        <div class="card">
+            <h3>🔍 搜索筛选</h3>
+            <div class="search-bar">
+                <input type="text" id="search-keyword" placeholder="搜索资源..." class="input">
+                <select id="search-grade" class="input">
+                    <option value="">选择年级</option>
+                    <option value="小学1年级">小学1年级</option>
+                    <option value="小学2年级">小学2年级</option>
+                    <option value="小学3年级">小学3年级</option>
+                    <option value="小学4年级">小学4年级</option>
+                    <option value="小学5年级">小学5年级</option>
+                    <option value="预初">预初</option>
+                    <option value="初中1年级">初中1年级</option>
+                    <option value="初中2年级">初中2年级</option>
+                    <option value="初中3年级">初中3年级</option>
+                    <option value="高中1年级">高中1年级</option>
+                    <option value="高中2年级">高中2年级</option>
+                    <option value="高中3年级">高中3年级</option>
+                </select>
+                <select id="search-subject" class="input">
+                    <option value="">选择科目</option>
+                    <option value="语文">语文</option>
+                    <option value="数学">数学</option>
+                    <option value="英语">英语</option>
+                    <option value="物理">物理</option>
+                    <option value="化学">化学</option>
+                    <option value="生物">生物</option>
+                    <option value="历史">历史</option>
+                    <option value="地理">地理</option>
+                    <option value="政治">政治</option>
+                </select>
+                <select id="search-type" class="input">
+                    <option value="">资源类型</option>
+                    <option value="课件">课件</option>
+                    <option value="教案">教案</option>
+                    <option value="学案">学案</option>
+                    <option value="作业">作业</option>
+                    <option value="试卷">试卷</option>
+                    <option value="题集">题集</option>
+                    <option value="素材">素材</option>
+                    <option value="备课包">备课包</option>
+                    <option value="其他">其他</option>
+                </select>
+                <button class="btn" onclick="searchResources()">搜索</button>
+            </div>
+        </div>
+
+        <!-- 资源列表 -->
+        <div class="card">
+            <h3>📚 学习资源</h3>
+            <div id="resources-container">
+                <div class="resource-grid" id="resources-grid">
+                    <!-- 资源将通过JavaScript动态加载 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 登录模态框 -->
+    <div id="login-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>用户登录</h3>
+            <div class="form-group">
+                <label>手机号</label>
+                <input type="text" id="login-phone" class="input" placeholder="请输入手机号">
+            </div>
+            <div class="form-group">
+                <label>密码</label>
+                <input type="password" id="login-password" class="input" placeholder="请输入密码">
+            </div>
+            <div>
+                <button class="btn" onclick="hideLogin()">取消</button>
+                <button class="btn btn-success" onclick="login()">登录</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 注册模态框 -->
+    <div id="register-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>用户注册</h3>
+            <div class="form-group">
+                <label>手机号</label>
+                <input type="text" id="register-phone" class="input" placeholder="请输入手机号">
+            </div>
+            <div class="form-group">
+                <label>昵称</label>
+                <input type="text" id="register-nickname" class="input" placeholder="请输入昵称">
+            </div>
+            <div class="form-group">
+                <label>密码</label>
+                <input type="password" id="register-password" class="input" placeholder="请输入密码">
+            </div>
+            <div class="form-group">
+                <label>确认密码</label>
+                <input type="password" id="register-confirm" class="input" placeholder="请再次输入密码">
+            </div>
+            <div class="form-group">
+                <label>城市</label>
+                <input type="text" id="register-city" class="input" placeholder="请输入所在城市">
+            </div>
+            <div class="form-group">
+                <label>孩子年级</label>
+                <select id="register-grade" class="input">
+                    <option value="">请选择年级</option>
+                    <option value="小学1年级">小学1年级</option>
+                    <option value="小学2年级">小学2年级</option>
+                    <option value="小学3年级">小学3年级</option>
+                    <option value="小学4年级">小学4年级</option>
+                    <option value="小学5年级">小学5年级</option>
+                    <option value="预初">预初</option>
+                    <option value="初中1年级">初中1年级</option>
+                    <option value="初中2年级">初中2年级</option>
+                    <option value="初中3年级">初中3年级</option>
+                    <option value="高中1年级">高中1年级</option>
+                    <option value="高中2年级">高中2年级</option>
+                    <option value="高中3年级">高中3年级</option>
+                </select>
+            </div>
+            <div>
+                <button class="btn" onclick="hideRegister()">取消</button>
+                <button class="btn btn-success" onclick="register()">注册</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentUser = null;
+        let resources = [];
+        let isLoggedIn = false;
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            loadResources();
+        });
+
+        // 检查登录状态
+        async function checkLoginStatus() {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                showAuthButtons();
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/v1/auth/me/', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    currentUser = await response.json();
+                    isLoggedIn = true;
+                    showUserInfo();
+                } else {
+                    localStorage.removeItem('access_token');
+                    showAuthButtons();
+                }
+            } catch (error) {
+                console.error('检查登录状态失败:', error);
+                showAuthButtons();
+            }
+        }
+
+        // 显示认证按钮
+        function showAuthButtons() {
+            document.getElementById('auth-buttons').classList.remove('hidden');
+            document.getElementById('user-menu').classList.add('hidden');
+            document.getElementById('user-info').classList.add('hidden');
+        }
+
+        // 显示用户信息
+        function showUserInfo() {
+            document.getElementById('auth-buttons').classList.add('hidden');
+            document.getElementById('user-menu').classList.remove('hidden');
+            document.getElementById('user-info').classList.remove('hidden');
+
+            document.getElementById('user-name').textContent = currentUser.nickname || '用户';
+            document.getElementById('user-nickname').textContent = currentUser.nickname || '用户';
+            document.getElementById('user-points').textContent = currentUser.points || 0;
+            document.getElementById('user-level').textContent = currentUser.level || '新手用户';
+            document.getElementById('user-downloads').textContent = currentUser.daily_downloads || 0;
+        }
+
+        // 加载资源列表
+        async function loadResources() {
+            try {
+                const response = await fetch('/api/v1/resources/');
+                const data = await response.json();
+                resources = data.items || [];
+                renderResources(resources);
+            } catch (error) {
+                console.error('加载资源失败:', error);
+                document.getElementById('resources-grid').innerHTML = '<p>加载资源失败，请稍后重试</p>';
+            }
+        }
+
+        // 渲染资源列表
+        function renderResources(resourceList) {
+            const container = document.getElementById('resources-grid');
+            if (!resourceList || resourceList.length === 0) {
+                container.innerHTML = '<p>暂无资源</p>';
+                return;
+            }
+
+            container.innerHTML = resourceList.map(resource => `
+                <div class="resource-card">
+                    <h4>${resource.title}</h4>
+                    <p>${resource.description || '暂无描述'}</p>
+                    <div>
+                        <span class="tag">${resource.grade}</span>
+                        <span class="tag">${resource.subject}</span>
+                        <span class="tag">${resource.resource_type}</span>
+                    </div>
+                    <div style="margin: 10px 0; color: #666; font-size: 12px;">
+                        <span>下载: ${resource.download_count}次</span> |
+                        <span>大小: ${formatFileSize(resource.file_size)}</span> |
+                        <span>类型: ${resource.file_type}</span>
+                    </div>
+                    <div style="text-align: right; margin-top: 15px;">
+                        <button class="btn" onclick="viewResource(${resource.id})">查看详情</button>
+                        <button class="btn btn-success" onclick="downloadResource(${resource.id})" ${!isLoggedIn ? 'disabled' : ''}>
+                            下载 (10积分)
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // 搜索资源
+        async function searchResources() {
+            const keyword = document.getElementById('search-keyword').value;
+            const grade = document.getElementById('search-grade').value;
+            const subject = document.getElementById('search-subject').value;
+            const resourceType = document.getElementById('search-type').value;
+
+            const params = new URLSearchParams();
+            if (keyword) params.append('q', keyword);
+            if (grade) params.append('grade', grade);
+            if (subject) params.append('subject', subject);
+            if (resourceType) params.append('resource_type', resourceType);
+
+            try {
+                const response = await fetch(`/api/v1/search/?${params}`);
+                const data = await response.json();
+                renderResources(data.items || []);
+            } catch (error) {
+                console.error('搜索失败:', error);
+                alert('搜索失败，请稍后重试');
+            }
+        }
+
+        // 显示登录模态框
+        function showLogin() {
+            document.getElementById('login-modal').classList.remove('hidden');
+        }
+
+        // 隐藏登录模态框
+        function hideLogin() {
+            document.getElementById('login-modal').classList.add('hidden');
+        }
+
+        // 显示注册模态框
+        function showRegister() {
+            document.getElementById('register-modal').classList.remove('hidden');
+        }
+
+        // 隐藏注册模态框
+        function hideRegister() {
+            document.getElementById('register-modal').classList.add('hidden');
+        }
+
+        // 登录
+        async function login() {
+            const phone = document.getElementById('login-phone').value;
+            const password = document.getElementById('login-password').value;
+
+            if (!phone || !password) {
+                alert('请填写手机号和密码');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/v1/auth/login/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ phone, password })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    localStorage.setItem('access_token', data.access_token);
+                    alert('登录成功！');
+                    hideLogin();
+                    checkLoginStatus();
+                } else {
+                    alert(data.detail || '登录失败');
+                }
+            } catch (error) {
+                console.error('登录失败:', error);
+                alert('登录失败，请稍后重试');
+            }
+        }
+
+        // 注册
+        async function register() {
+            const phone = document.getElementById('register-phone').value;
+            const nickname = document.getElementById('register-nickname').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm').value;
+            const city = document.getElementById('register-city').value;
+            const childGrade = document.getElementById('register-grade').value;
+
+            if (!phone || !nickname || !password || !confirmPassword || !childGrade) {
+                alert('请填写所有必填字段');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert('两次输入的密码不一致');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/v1/auth/register/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        phone,
+                        nickname,
+                        password,
+                        confirm_password: confirmPassword,
+                        city,
+                        child_grade: childGrade
+                    })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert('注册成功！请登录');
+                    hideRegister();
+                    showLogin();
+                } else {
+                    alert(data.detail || '注册失败');
+                }
+            } catch (error) {
+                console.error('注册失败:', error);
+                alert('注册失败，请稍后重试');
+            }
+        }
+
+        // 退出登录
+        function logout() {
+            localStorage.removeItem('access_token');
+            currentUser = null;
+            isLoggedIn = false;
+            showAuthButtons();
+            alert('已退出登录');
+        }
+
+        // 每日签到
+        async function dailySignIn() {
+            if (!isLoggedIn) {
+                alert('请先登录');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/v1/auth/signin/', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    }
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert('签到成功！获得5积分');
+                    checkLoginStatus(); // 刷新用户信息
+                } else {
+                    alert(data.detail || '签到失败');
+                }
+            } catch (error) {
+                console.error('签到失败:', error);
+                alert('签到失败，请稍后重试');
+            }
+        }
+
+        // 查看资源详情
+        function viewResource(resourceId) {
+            const resource = resources.find(r => r.id === resourceId);
+            if (resource) {
+                alert(`资源详情：
+标题：${resource.title}
+描述：${resource.description || '暂无描述'}
+年级：${resource.grade}
+科目：${resource.subject}
+类型：${resource.resource_type}
+文件大小：${formatFileSize(resource.file_size)}
+下载次数：${resource.download_count}`);
+            }
+        }
+
+        // 下载资源
+        async function downloadResource(resourceId) {
+            if (!isLoggedIn) {
+                alert('请先登录');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/v1/resources/${resourceId}/download/`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    }
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert('下载成功！');
+                    checkLoginStatus(); // 刷新用户信息
+                } else {
+                    alert(data.detail || '下载失败');
+                }
+            } catch (error) {
+                console.error('下载失败:', error);
+                alert('下载失败，请稍后重试');
+            }
+        }
+
+        // 显示上传模态框
+        function showUpload() {
+            alert('上传功能开发中...');
+        }
+
+        // 点击模态框背景关闭
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

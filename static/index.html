@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K12家校学习资料共享平台</title>
+    <!-- 尝试多个CDN源 -->
+    <link href="https://cdn.jsdelivr.net/npm/element-plus@2.4.2/dist/index.css" rel="stylesheet" onerror="this.onerror=null;this.href='https://unpkg.com/element-plus@2.4.2/dist/index.css';">
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js" onerror="document.write('<script src=\'https://unpkg.com/vue@3/dist/vue.global.js\'><\/script>')"></script>
+    <script src="https://cdn.jsdelivr.net/npm/element-plus@2.4.2/dist/index.full.js" onerror="document.write('<script src=\'https://unpkg.com/element-plus@2.4.2/dist/index.full.js\'><\/script>')"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" onerror="document.write('<script src=\'https://unpkg.com/axios/dist/axios.min.js\'><\/script>')"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+            background-color: #f5f7fa;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .user-info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        }
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+        .sidebar {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            height: fit-content;
+            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        }
+        .content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        }
+        .resource-card {
+            border: 1px solid #ebeef5;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+        .resource-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+        .resource-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #303133;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .file-type-icon {
+            font-size: 14px;
+            margin-left: 8px;
+            flex-shrink: 0;
+            line-height: 1;
+            background: #f0f2f5;
+            color: #606266;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .resource-meta {
+            font-size: 12px;
+            color: #909399;
+            display: flex;
+            gap: 16px;
+            margin-bottom: 8px;
+        }
+        .resource-description {
+            font-size: 14px;
+            color: #606266;
+            line-height: 1.5;
+        }
+        .login-form {
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        }
+        .grade-selection, .subject-selection {
+            margin-bottom: 10px;
+        }
+        .selection-hint {
+            font-size: 14px;
+            color: #606266;
+            margin-bottom: 8px;
+        }
+        .selection-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .selection-buttons .el-button {
+            margin: 0 !important;
+        }
+        .grade-group {
+            margin-bottom: 12px;
+            padding: 8px;
+            border-radius: 6px;
+            background-color: #f8f9fa;
+        }
+        .grade-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .grade-group-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #303133;
+            min-width: 40px;
+            flex-shrink: 0;
+        }
+        .primary-grade-btn {
+            --el-button-text-color: #409eff;
+            --el-button-border-color: #409eff;
+        }
+        .primary-grade-btn.el-button--primary {
+            --el-button-text-color: #ffffff !important;
+            --el-button-bg-color: #409eff !important;
+            --el-button-border-color: #409eff !important;
+        }
+        .middle-grade-btn {
+            --el-button-text-color: #67c23a;
+            --el-button-border-color: #67c23a;
+        }
+        .middle-grade-btn.el-button--success {
+            --el-button-text-color: #ffffff !important;
+            --el-button-bg-color: #67c23a !important;
+            --el-button-border-color: #67c23a !important;
+        }
+        .high-grade-btn {
+            --el-button-text-color: #e6a23c;
+            --el-button-border-color: #e6a23c;
+        }
+        .high-grade-btn.el-button--warning {
+            --el-button-text-color: #ffffff !important;
+            --el-button-bg-color: #e6a23c !important;
+            --el-button-border-color: #e6a23c !important;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="header">
+            <h1>K12家校学习资料共享平台</h1>
+            <p>基于积分机制的学习资源共享社区</p>
+        </div>
+
+        <!-- 登录界面 -->
+        <div v-if="!isLoggedIn" class="login-form">
+            <el-tabs v-model="activeTab" @tab-click="handleTabClick">
+                <el-tab-pane label="登录" name="login">
+                    <el-form :model="loginForm" :rules="loginRules" ref="loginFormRef">
+                        <el-form-item prop="phone">
+                            <el-input v-model="loginForm.phone" placeholder="请输入手机号" prefix-icon="Phone">
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item prop="password">
+                            <el-input v-model="loginForm.password" type="password" placeholder="请输入密码" prefix-icon="Lock" show-password>
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="login" :loading="loading" style="width: 100%;">
+                                登录
+                            </el-button>
+                        </el-form-item>
+                    </el-form>
+                </el-tab-pane>
+                
+                <el-tab-pane label="注册" name="register">
+                    <el-form :model="registerForm" :rules="registerRules" ref="registerFormRef">
+                        <el-form-item prop="phone">
+                            <el-input v-model="registerForm.phone" placeholder="请输入手机号" prefix-icon="Phone">
+                            </el-input>
+                        </el-form-item>
+                        <!-- 验证码功能（可选，需要配置短信服务） -->
+                        <!--
+                        <el-form-item prop="verification_code" v-if="enableSmsVerification">
+                            <el-input v-model="registerForm.verification_code" placeholder="请输入验证码" prefix-icon="Message">
+                                <template #append>
+                                    <el-button @click="sendVerificationCode" :disabled="codeSending || countdown > 0">
+                                        {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
+                                    </el-button>
+                                </template>
+                            </el-input>
+                        </el-form-item>
+                        -->
+                        <el-form-item prop="password">
+                            <el-input v-model="registerForm.password" type="password" placeholder="请输入密码" prefix-icon="Lock" show-password>
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item prop="confirm_password">
+                            <el-input v-model="registerForm.confirm_password" type="password" placeholder="请确认密码" prefix-icon="Lock" show-password>
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item prop="nickname">
+                            <el-input v-model="registerForm.nickname" placeholder="请输入昵称" prefix-icon="User">
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item prop="child_grade">
+                            <el-select v-model="registerForm.child_grade" placeholder="请选择孩子年级" style="width: 100%;">
+                                <el-option v-for="grade in grades" :key="grade" :label="grade" :value="grade">
+                                </el-option>
+                            </el-select>
+                            <div style="font-size: 12px; color: #909399; margin-top: 4px;">
+                                暑假期间，请选择新入学的年级
+                            </div>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="register" :loading="loading" style="width: 100%;">
+                                注册
+                            </el-button>
+                        </el-form-item>
+                    </el-form>
+                </el-tab-pane>
+            </el-tabs>
+        </div>
+
+        <!-- 主界面 -->
+        <div v-if="isLoggedIn" class="container">
+            <!-- 用户信息栏 -->
+            <div class="user-info">
+                <el-row :gutter="20" align="middle">
+                    <el-col :span="18">
+                        <el-descriptions :column="4" border>
+                            <el-descriptions-item label="昵称">{{ userInfo.nickname }}</el-descriptions-item>
+                            <el-descriptions-item label="积分">
+                                <el-tag type="success">{{ userInfo.points }}</el-tag>
+                            </el-descriptions-item>
+                            <el-descriptions-item label="等级">
+                                <el-tag>{{ userInfo.level }}</el-tag>
+                            </el-descriptions-item>
+                            <el-descriptions-item label="今日下载">{{ userInfo.daily_downloads }}</el-descriptions-item>
+                        </el-descriptions>
+                    </el-col>
+                    <el-col :span="6" style="text-align: right;">
+                        <el-button @click="showUploadDialog = true" type="primary" icon="Upload">上传资源</el-button>
+                        <el-button @click="logout" type="danger" icon="SwitchButton">退出登录</el-button>
+                    </el-col>
+                </el-row>
+            </div>
+
+            <div class="main-content">
+                <!-- 侧边栏 -->
+                <div class="sidebar">
+                    <h3>搜索筛选</h3>
+                    <el-form :model="searchForm" label-width="80px">
+                        <el-form-item label="关键词">
+                            <el-input v-model="searchForm.keyword" placeholder="搜索资源标题和描述" clearable>
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item label="年级">
+                            <el-select v-model="searchForm.grade" placeholder="选择年级" clearable style="width: 100%;">
+                                <el-option label="全部年级" value="">
+                                </el-option>
+                                <el-option v-for="grade in grades" :key="grade" :label="grade" :value="grade">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="科目">
+                            <el-select v-model="searchForm.subject" placeholder="选择科目" clearable style="width: 100%;">
+                                <el-option label="全部科目" value="">
+                                </el-option>
+                                <el-option v-for="subject in subjects" :key="subject" :label="subject" :value="subject">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="类别">
+                            <el-select v-model="searchForm.resource_type" placeholder="选择类别" clearable style="width: 100%;">
+                                <el-option label="不限" value="">
+                                </el-option>
+                                <el-option v-for="type in resourceTypes" :key="type" :label="type" :value="type">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+
+                        <el-form-item>
+                            <el-button type="primary" @click="searchResources" style="width: 100%;">搜索</el-button>
+                        </el-form-item>
+                    </el-form>
+                </div>
+
+                <!-- 主内容区 -->
+                <div class="content">
+                    <el-tabs v-model="activeContentTab">
+                        <el-tab-pane label="资源列表" name="resources">
+                            <div v-if="resources.length === 0" style="text-align: center; padding: 40px;">
+                                <el-empty description="暂无资源"></el-empty>
+                            </div>
+                            <div v-else>
+                                <div v-for="resource in resources" :key="resource.id" class="resource-card">
+                                    <div class="resource-title">
+                                        {{ resource.title }}
+                                        <span class="file-type-icon">{{ getFileIcon(resource.file_name) }}</span>
+                                    </div>
+                                    <div class="resource-meta">
+                                        <span>{{ resource.grade }}</span>
+                                        <span>{{ resource.subject }}</span>
+                                        <span>{{ resource.resource_type }}</span>
+                                        <span>下载: {{ resource.download_count }}次</span>
+                                        <span>{{ formatDate(resource.created_at) }}</span>
+                                    </div>
+                                    <div class="resource-description">{{ resource.description }}</div>
+                                    <div style="margin-top: 12px;">
+                                        <el-button size="small" type="primary" @click="downloadResource(resource)">
+                                            下载 (10积分)
+                                        </el-button>
+                                    </div>
+                                </div>
+                            </div>
+                        </el-tab-pane>
+                        
+                        <el-tab-pane label="悬赏求助" name="bounties">
+                            <el-button type="primary" @click="showBountyDialog = true" style="margin-bottom: 20px;">
+                                发布悬赏
+                            </el-button>
+                            <div>悬赏列表功能开发中...</div>
+                        </el-tab-pane>
+                    </el-tabs>
+                </div>
+            </div>
+        </div>
+
+        <!-- 上传资源对话框 -->
+        <el-dialog v-model="showUploadDialog" title="上传资源" width="600px">
+            <el-form :model="uploadForm" :rules="uploadRules" ref="uploadFormRef" label-width="100px">
+                <el-form-item label="资源标题" prop="title" required>
+                    <el-input v-model="uploadForm.title" placeholder="请输入资源标题"></el-input>
+                </el-form-item>
+                <el-form-item label="年级" prop="grade" required>
+                    <div class="grade-selection">
+                        <div class="selection-hint">请选择年级：</div>
+
+                        <!-- 小学年级 -->
+                        <div class="grade-group">
+                            <div class="grade-row">
+                                <div class="grade-group-title">小学</div>
+                                <div class="selection-buttons">
+                                    <el-button
+                                        v-for="grade in primaryGrades"
+                                        :key="grade"
+                                        :type="uploadForm.grade.includes(grade) ? 'primary' : ''"
+                                        size="small"
+                                        class="primary-grade-btn"
+                                        @click="toggleGrade(grade)">
+                                        {{ grade.replace('小学', '') }}
+                                    </el-button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 初中年级 -->
+                        <div class="grade-group">
+                            <div class="grade-row">
+                                <div class="grade-group-title">初中</div>
+                                <div class="selection-buttons">
+                                    <el-button
+                                        v-for="grade in middleGrades"
+                                        :key="grade"
+                                        :type="uploadForm.grade.includes(grade) ? 'success' : ''"
+                                        size="small"
+                                        class="middle-grade-btn"
+                                        @click="toggleGrade(grade)">
+                                        {{ grade === '预初' ? '预初' : grade.replace('初中', '') }}
+                                    </el-button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 高中年级 -->
+                        <div class="grade-group">
+                            <div class="grade-row">
+                                <div class="grade-group-title">高中</div>
+                                <div class="selection-buttons">
+                                    <el-button
+                                        v-for="grade in highGrades"
+                                        :key="grade"
+                                        :type="uploadForm.grade.includes(grade) ? 'warning' : ''"
+                                        size="small"
+                                        class="high-grade-btn"
+                                        @click="toggleGrade(grade)">
+                                        {{ grade.replace('高中', '') }}
+                                    </el-button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </el-form-item>
+                <el-form-item label="科目" prop="subject" required>
+                    <div class="subject-selection">
+                        <div class="selection-hint">请选择科目：</div>
+                        <div class="selection-buttons">
+                            <el-button
+                                v-for="subject in subjects"
+                                :key="subject"
+                                :type="uploadForm.subject === subject ? 'primary' : ''"
+                                size="small"
+                                @click="selectSubject(subject)"
+                                style="margin: 2px;">
+                                {{ subject }}
+                            </el-button>
+                        </div>
+                    </div>
+                </el-form-item>
+                <el-form-item label="资源类别" prop="resource_type" required>
+                    <div class="resource-type-selection">
+                        <div class="selection-hint">请选择资源类别：</div>
+                        <div class="selection-buttons">
+                            <el-button
+                                v-for="type in resourceTypes"
+                                :key="type"
+                                :type="uploadForm.resource_type === type ? 'primary' : ''"
+                                size="small"
+                                @click="selectResourceType(type)"
+                                style="margin: 2px;">
+                                {{ type }}
+                            </el-button>
+                        </div>
+                    </div>
+                </el-form-item>
+                <el-form-item label="资源描述" prop="description">
+                    <el-input v-model="uploadForm.description" type="textarea" :rows="3" placeholder="请简要描述资源内容（可选）"></el-input>
+                </el-form-item>
+                <el-form-item label="选择文件 *" prop="file">
+                    <el-upload
+                        ref="uploadRef"
+                        :auto-upload="false"
+                        :limit="1"
+                        :on-change="handleFileChange"
+                        accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.zip,.rar">
+                        <el-button type="primary">选择文件</el-button>
+                        <template #tip>
+                            <div class="el-upload__tip">
+                                支持PDF、DOC、PPT、XLS、JPG、PNG、ZIP、RAR格式，文件大小不超过50MB
+                            </div>
+                        </template>
+                    </el-upload>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button @click="showUploadDialog = false">取消</el-button>
+                <el-button type="primary" @click="uploadResource" :loading="uploading">上传</el-button>
+            </template>
+        </el-dialog>
+
+        <!-- 发布悬赏对话框 -->
+        <el-dialog v-model="showBountyDialog" title="发布悬赏" width="600px">
+            <div>悬赏功能开发中...</div>
+        </el-dialog>
+    </div>
+
+    <!-- CDN检测和fallback -->
+    <script>
+        // 检测Vue是否加载成功
+        if (typeof Vue === 'undefined') {
+            console.error('Vue未加载成功，使用fallback');
+            document.body.innerHTML = `
+                <div style="max-width: 800px; margin: 50px auto; padding: 20px; font-family: Arial, sans-serif;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 30px;">
+                        <h1>🎓 K12家校学习资料共享平台</h1>
+                        <p>基于积分机制的学习资源共享社区</p>
+                    </div>
+
+                    <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                        <h3>⚠️ 页面加载问题</h3>
+                        <p>由于网络问题，前端框架无法正常加载。请尝试以下解决方案：</p>
+                        <ul>
+                            <li>刷新页面重试</li>
+                            <li>检查网络连接</li>
+                            <li>使用简化版页面：<a href="/static/simple.html" style="color: #409eff;">点击这里</a></li>
+                            <li>直接访问API文档：<a href="/docs" style="color: #409eff;">API文档</a></li>
+                        </ul>
+                    </div>
+
+                    <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.1);">
+                        <h3>🔧 开发者选项</h3>
+                        <p>如果您是开发者，可以：</p>
+                        <ul>
+                            <li>查看控制台错误信息</li>
+                            <li>检查CDN资源是否可访问</li>
+                            <li>使用本地开发环境</li>
+                        </ul>
+                        <div style="margin-top: 20px;">
+                            <a href="/docs" style="background: #409eff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-right: 10px;">API文档</a>
+                            <a href="/static/simple.html" style="background: #67c23a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">简化版页面</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            // Vue加载成功，检测ElementPlus
+            if (typeof ElementPlus === 'undefined') {
+                console.error('ElementPlus未加载成功');
+                ElMessage = {
+                    success: (msg) => alert('成功: ' + msg),
+                    error: (msg) => alert('错误: ' + msg),
+                    warning: (msg) => alert('警告: ' + msg)
+                };
+            }
+
+            // 加载主应用
+            const script = document.createElement('script');
+            script.src = 'js/app.js?v=9';
+            script.onerror = function() {
+                console.error('主应用脚本加载失败');
+                document.body.innerHTML += '<div style="position: fixed; top: 10px; right: 10px; background: #f56c6c; color: white; padding: 10px; border-radius: 5px;">应用加载失败，请刷新页面</div>';
+            };
+            document.head.appendChild(script);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>资源列表图标演示</title>
+    <link href="https://cdn.jsdelivr.net/npm/element-plus@2.4.2/dist/index.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/element-plus@2.4.2/dist/index.full.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+            background-color: #f5f7fa;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .resource-card {
+            border: 1px solid #ebeef5;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        .resource-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .resource-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #303133;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .file-type-icon {
+            font-size: 14px;
+            margin-left: 8px;
+            flex-shrink: 0;
+            line-height: 1;
+            background: #f0f2f5;
+            color: #606266;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .resource-meta {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .resource-meta span {
+            background: #f0f2f5;
+            color: #606266;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .resource-description {
+            color: #909399;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        
+        .demo-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <h1>📁 资源列表文件类型图标演示</h1>
+            <p>展示不同文件类型在资源标题右侧的图标效果</p>
+            
+            <div class="demo-section">
+                <h3>📚 资源列表</h3>
+                
+                <div v-for="resource in demoResources" :key="resource.id" class="resource-card">
+                    <div class="resource-title">
+                        {{ resource.title }}
+                        <span class="file-type-icon">{{ getFileIcon(resource.file_name) }}</span>
+                    </div>
+                    <div class="resource-meta">
+                        <span>{{ resource.grade }}</span>
+                        <span>{{ resource.subject }}</span>
+                        <span>{{ resource.resource_type }}</span>
+                        <span>下载: {{ resource.download_count }}次</span>
+                        <span>{{ resource.date }}</span>
+                    </div>
+                    <div class="resource-description">{{ resource.description }}</div>
+                    <div>
+                        <el-button size="small" type="primary">下载 (10积分)</el-button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="demo-section">
+                <h3>🎨 图标说明</h3>
+                <ul>
+                    <li><span style="background: #f0f2f5; color: #606266; padding: 2px 6px; border-radius: 4px; font-weight: 500;">📄 PDF</span> <strong>PDF文档</strong> - 便携式文档格式</li>
+                    <li><span style="background: #f0f2f5; color: #606266; padding: 2px 6px; border-radius: 4px; font-weight: 500;">📘 DOCX</span> <strong>Word文档</strong> - Microsoft Word文档</li>
+                    <li><span style="background: #f0f2f5; color: #606266; padding: 2px 6px; border-radius: 4px; font-weight: 500;">📊 PPTX</span> <strong>PowerPoint</strong> - 演示文稿文件</li>
+                    <li><span style="background: #f0f2f5; color: #606266; padding: 2px 6px; border-radius: 4px; font-weight: 500;">📈 XLSX</span> <strong>Excel表格</strong> - 电子表格文件</li>
+                    <li><span style="background: #f0f2f5; color: #606266; padding: 2px 6px; border-radius: 4px; font-weight: 500;">🖼️ JPG</span> <strong>图片文件</strong> - 图像文件格式</li>
+                    <li><span style="background: #f0f2f5; color: #606266; padding: 2px 6px; border-radius: 4px; font-weight: 500;">🗜️ ZIP</span> <strong>压缩文件</strong> - 压缩归档文件</li>
+                </ul>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="/static/index.html" style="color: #409eff; text-decoration: none;">← 返回主页面</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    demoResources: [
+                        {
+                            id: 1,
+                            title: '小学数学课件集合',
+                            file_name: 'math_courseware.pdf',
+                            grade: '小学1年级',
+                            subject: '数学',
+                            resource_type: '课件',
+                            download_count: 25,
+                            date: '2025/7/24',
+                            description: '包含加减法基础知识的完整课件'
+                        },
+                        {
+                            id: 2,
+                            title: '语文教案模板',
+                            file_name: 'chinese_lesson_plan.docx',
+                            grade: '小学2年级',
+                            subject: '语文',
+                            resource_type: '教案',
+                            download_count: 18,
+                            date: '2025/7/23',
+                            description: '适用于小学语文课堂的标准教案模板'
+                        },
+                        {
+                            id: 3,
+                            title: '英语单词练习',
+                            file_name: 'english_words.pptx',
+                            grade: '小学3年级',
+                            subject: '英语',
+                            resource_type: '课件',
+                            download_count: 32,
+                            date: '2025/7/22',
+                            description: '常用英语单词的互动练习课件'
+                        },
+                        {
+                            id: 4,
+                            title: '学生成绩统计表',
+                            file_name: 'student_grades.xlsx',
+                            grade: '小学1年级',
+                            subject: '数学',
+                            resource_type: '其他',
+                            download_count: 12,
+                            date: '2025/7/21',
+                            description: '用于记录和分析学生成绩的Excel表格'
+                        },
+                        {
+                            id: 5,
+                            title: '科学实验图片',
+                            file_name: 'science_experiment.jpg',
+                            grade: '小学4年级',
+                            subject: '科学',
+                            resource_type: '素材',
+                            download_count: 8,
+                            date: '2025/7/20',
+                            description: '科学实验过程的高清图片资料'
+                        },
+                        {
+                            id: 6,
+                            title: '教学资源包',
+                            file_name: 'teaching_materials.zip',
+                            grade: '小学5年级',
+                            subject: '语文',
+                            resource_type: '备课包',
+                            download_count: 45,
+                            date: '2025/7/19',
+                            description: '包含多个单元的完整教学资源压缩包'
+                        }
+                    ]
+                };
+            },
+            methods: {
+                // 获取文件图标和类型
+                getFileIcon(fileName) {
+                    if (!fileName) return '📄';
+                    const ext = fileName.toLowerCase().split('.').pop();
+                    const iconMap = {
+                        'pdf': '📄 PDF',
+                        'doc': '📘 DOC',
+                        'docx': '📘 DOCX',
+                        'ppt': '📊 PPT',
+                        'pptx': '📊 PPTX',
+                        'xls': '📈 XLS',
+                        'xlsx': '📈 XLSX',
+                        'jpg': '🖼️ JPG',
+                        'jpeg': '🖼️ JPEG',
+                        'png': '🖼️ PNG',
+                        'zip': '🗜️ ZIP',
+                        'rar': '🗜️ RAR'
+                    };
+                    return iconMap[ext] || '📄 ' + ext.toUpperCase();
+                }
+            }
+        }).use(ElementPlus).mount('#app');
+    </script>
+</body>
+</html>

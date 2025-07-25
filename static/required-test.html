@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>必填字段测试</title>
+    <link href="https://cdn.jsdelivr.net/npm/element-plus@2.4.2/dist/index.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/element-plus@2.4.2/dist/index.full.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+            background-color: #f5f7fa;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        }
+        
+        .demo-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e4e7ed;
+            border-radius: 8px;
+        }
+        
+        .demo-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #303133;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <h1>📋 必填字段红色星号测试</h1>
+            <p>测试Element Plus表单中必填字段的红色星号显示效果</p>
+            
+            <div class="demo-section">
+                <div class="demo-title">✅ 使用 required 属性的表单字段</div>
+                <el-form :model="form" :rules="rules" ref="formRef" label-width="120px">
+                    <el-form-item label="资源标题" prop="title" required>
+                        <el-input v-model="form.title" placeholder="请输入资源标题"></el-input>
+                    </el-form-item>
+                    
+                    <el-form-item label="年级" prop="grade" required>
+                        <el-select v-model="form.grade" placeholder="请选择年级" style="width: 100%;">
+                            <el-option label="小学1年级" value="小学1年级"></el-option>
+                            <el-option label="小学2年级" value="小学2年级"></el-option>
+                            <el-option label="初中1年级" value="初中1年级"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    
+                    <el-form-item label="科目" prop="subject" required>
+                        <el-select v-model="form.subject" placeholder="请选择科目" style="width: 100%;">
+                            <el-option label="语文" value="语文"></el-option>
+                            <el-option label="数学" value="数学"></el-option>
+                            <el-option label="英语" value="英语"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    
+                    <el-form-item label="资源类别" prop="type" required>
+                        <el-select v-model="form.type" placeholder="请选择资源类别" style="width: 100%;">
+                            <el-option label="课件" value="课件"></el-option>
+                            <el-option label="教案" value="教案"></el-option>
+                            <el-option label="作业" value="作业"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    
+                    <el-form-item label="选择文件" prop="file" required>
+                        <el-upload
+                            :auto-upload="false"
+                            :limit="1"
+                            accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.zip,.rar">
+                            <el-button type="primary">选择文件</el-button>
+                        </el-upload>
+                    </el-form-item>
+                    
+                    <el-form-item label="资源描述" prop="description">
+                        <el-input v-model="form.description" type="textarea" :rows="3" placeholder="请简要描述资源内容（可选）"></el-input>
+                    </el-form-item>
+                    
+                    <el-form-item>
+                        <el-button type="primary" @click="submitForm">提交</el-button>
+                        <el-button @click="resetForm">重置</el-button>
+                    </el-form-item>
+                </el-form>
+            </div>
+            
+            <div class="demo-section">
+                <div class="demo-title">📝 说明</div>
+                <ul>
+                    <li><strong>红色星号 *</strong> - 表示必填字段，由Element Plus的 <code>required</code> 属性自动生成</li>
+                    <li><strong>左对齐</strong> - 星号位于标签文字的左侧</li>
+                    <li><strong>一致性</strong> - 所有必填字段的星号样式保持一致</li>
+                    <li><strong>可选字段</strong> - 如"资源描述"没有星号，表示为可选字段</li>
+                </ul>
+            </div>
+            
+            <div class="demo-section">
+                <div class="demo-title">🎯 必填字段列表</div>
+                <ol>
+                    <li>✅ <strong>资源标题</strong> - 带红色星号</li>
+                    <li>✅ <strong>年级</strong> - 带红色星号</li>
+                    <li>✅ <strong>科目</strong> - 带红色星号</li>
+                    <li>✅ <strong>资源类别</strong> - 带红色星号</li>
+                    <li>✅ <strong>选择文件</strong> - 带红色星号</li>
+                    <li>⭕ <strong>资源描述</strong> - 无星号（可选）</li>
+                </ol>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="/static/index.html" style="color: #409eff; text-decoration: none;">← 返回主页面</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+        const { ElMessage } = ElementPlus;
+
+        createApp({
+            data() {
+                return {
+                    form: {
+                        title: '',
+                        grade: '',
+                        subject: '',
+                        type: '',
+                        file: null,
+                        description: ''
+                    },
+                    rules: {
+                        title: [
+                            { required: true, message: '请输入资源标题', trigger: 'blur' }
+                        ],
+                        grade: [
+                            { required: true, message: '请选择年级', trigger: 'change' }
+                        ],
+                        subject: [
+                            { required: true, message: '请选择科目', trigger: 'change' }
+                        ],
+                        type: [
+                            { required: true, message: '请选择资源类别', trigger: 'change' }
+                        ],
+                        file: [
+                            { required: true, message: '请选择文件', trigger: 'change' }
+                        ]
+                    }
+                };
+            },
+            methods: {
+                async submitForm() {
+                    try {
+                        await this.$refs.formRef.validate();
+                        ElMessage.success('表单验证通过！');
+                    } catch (error) {
+                        ElMessage.error('请填写所有必填字段');
+                    }
+                },
+                resetForm() {
+                    this.$refs.formRef.resetFields();
+                }
+            }
+        }).use(ElementPlus).mount('#app');
+    </script>
+</body>
+</html>
