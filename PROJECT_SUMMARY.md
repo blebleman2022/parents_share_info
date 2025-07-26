@@ -86,7 +86,7 @@
 
 ```
 ├── app/                    # 应用主目录
-│   ├── api/v1/            # API路由（认证、用户、资源、下载、悬赏、搜索）
+│   ├── api/v1/            # API路由（认证、用户、资源、下载、悬赏、搜索、管理）
 │   ├── core/              # 核心配置（数据库、安全、配置）
 │   ├── crud/              # 数据库操作
 │   ├── models/            # 数据模型
@@ -94,18 +94,26 @@
 │   └── services/          # 业务逻辑服务
 ├── static/                # 前端静态文件
 │   ├── index.html         # 主页面
-│   └── js/app.js         # 前端逻辑
+│   ├── admin.html         # 管理后台
+│   ├── js/app.js         # 前端逻辑
+│   └── *.html            # 其他页面
 ├── uploads/               # 文件上传目录
+│   ├── resources/         # 资源文件
+│   └── avatars/          # 用户头像
+├── logs/                  # 日志文件
 ├── main.py               # 应用入口
 ├── start.py              # 启动脚本
 ├── init_db.py            # 数据库初始化
-├── test_api.py           # API测试脚本
+├── test_*.py             # 测试脚本
 ├── requirements.txt      # Python依赖
 ├── docker-compose.yml    # Docker编排
 ├── Dockerfile           # Docker镜像
 ├── database_design.sql  # 数据库设计
+├── k12_share.db         # SQLite数据库
 ├── README.md            # 项目说明
 ├── DEPLOYMENT.md        # 部署指南
+├── ADMIN_README.md      # 管理员指南
+├── TECHNICAL_ARCHITECTURE.md # 技术架构
 └── PROJECT_SUMMARY.md   # 项目总结
 ```
 
