@@ -1,0 +1,89 @@
+# K12 家校资料共享平台 Docker Compose 配置
+# 注意：从 Docker Compose v2.0 开始，version 字段已被弃用
+
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: k12-platform
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+      - ./k12_share.db:/app/k12_share.db
+      - ./static:/app/static
+      - ./staticfiles:/app/staticfiles
+    environment:
+      - PYTHONPATH=/app
+      - TZ=Asia/Shanghai
+      - ENVIRONMENT=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - k12-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    depends_on:
+      - db-backup
+
+  # 数据库备份服务
+  db-backup:
+    image: alpine:latest
+    container_name: k12-db-backup
+    volumes:
+      - ./k12_share.db:/data/k12_share.db:ro
+      - ./backups:/backups
+    command: >
+      sh -c "
+        mkdir -p /backups &&
+        while true; do
+          timestamp=$$(date +%Y%m%d_%H%M%S) &&
+          cp /data/k12_share.db /backups/k12_share_$$timestamp.db &&
+          echo 'Database backup created: k12_share_$$timestamp.db' &&
+          find /backups -name 'k12_share_*.db' -mtime +7 -delete &&
+          sleep 86400
+        done
+      "
+    restart: unless-stopped
+    networks:
+      - k12-network
+
+networks:
+  k12-network:
+    driver: bridge
+    name: k12-platform-network
+
+version: "3"
+ 
+services:
+  next-app:
+    build:
+      context: ./next-app
+      dockerfile: prod.Dockerfile
+      args:
+        ENV_VARIABLE: ${ENV_VARIABLE}
+        NEXT_PUBLIC_ENV_VARIABLE: ${NEXT_PUBLIC_ENV_VARIABLE}
+    restart: always
+    ports:
+      - 3000
+    networks:
+      - dokploy-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.<unique-name>.rule=Host(`your-domain.com`)"
+      - "traefik.http.routers.<unique-name>.entrypoints=websecure"
+      - "traefik.http.routers.<unique-name>.tls.certResolver=letsencrypt"
+      - "traefik.http.services.<unique-name>.loadbalancer.server.port=3000"
+networks:
+  dokploy-network:
+    external: true
